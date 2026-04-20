@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "892908948641",
+    "firebase_url": "https://registro-de-asistencia-3506a-default-rtdb.firebaseio.com",
+    "project_id": "registro-de-asistencia-3506a",
+    "storage_bucket": "registro-de-asistencia-3506a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:892908948641:android:d7f4c1b2db8d71a90b74e0",
+        "android_client_info": {
+          "package_name": "com.example.registroasistencia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "892908948641-6ksig4umcq7aiilc7qmfiahl0ttemfg3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtoK2lVSGM9oQ3_tuMc-H5EV3XjNuTJ3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "892908948641-6ksig4umcq7aiilc7qmfiahl0ttemfg3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
