@@ -1,8 +1,15 @@
 package com.example.registroasistencia
 
+import android.Manifest
+import android.app.Activity
 import android.app.TimePickerDialog
+import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothManager
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.registroasistencia.databinding.ActivityCreateCourseBinding
 import com.example.registroasistencia.models.Course
@@ -17,6 +24,9 @@ class CreateCourseActivity : AppCompatActivity() {
     private var endTime: Calendar = Calendar.getInstance()
     private val database = FirebaseDatabase.getInstance().getReference("courses")
     private val auth = FirebaseAuth.getInstance()
+
+    private var bluetoothaddress=""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +50,25 @@ class CreateCourseActivity : AppCompatActivity() {
         binding.btnSaveCourse.setOnClickListener {
             saveCourse()
         }
+
+        val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
+        val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.getAdapter()
+
+        if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_CONNECT), 1)
+            return
+        }
+        val enableBtLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // Bluetooth was enabled
+            }
+        }
+        if (bluetoothAdapter?.isEnabled == false) {
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            enableBtLauncher.launch(enableBtIntent)
+        }
+        bluetoothaddress=bluetoothAdapter?.name.toString()
+
     }
 
     private fun showTimePicker(onTimeSelected: (Calendar) -> Unit) {
@@ -71,7 +100,8 @@ class CreateCourseActivity : AppCompatActivity() {
                 longitude = lon,
                 radius = radius,
                 startTime = startTime.timeInMillis,
-                endTime = endTime.timeInMillis
+                endTime = endTime.timeInMillis,
+                bluetoothAddress = bluetoothaddress
             )
 
             database.child(courseId).setValue(course).addOnCompleteListener {
@@ -82,4 +112,5 @@ class CreateCourseActivity : AppCompatActivity() {
             }
         }
     }
+
 }
