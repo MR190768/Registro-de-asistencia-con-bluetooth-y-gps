@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Latitude"
-            android:inputType="numberDecimal|numberSigned"/>
+            android:inputType="numberDecimal|numberSigned" />
 
         <EditText
             android:id="@+id/etLongitude"
@@ -51,11 +51,11 @@
             android:hint="Radius (meters)"
             android:inputType="numberDecimal"/>
 
-        <TextView
-            android:id="@+id/btprueba"
+        <Button
+            android:id="@+id/btnGetlocation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TextView" />
+            android:text="Obtener mi ubicacion" />
 
         <TextView
             android:layout_width="wrap_content"

@@ -9,9 +9,11 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.registroasistencia.databinding.ActivityAttendanceBinding
@@ -46,6 +48,7 @@ class AttendanceActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAttendanceBinding.inflate(layoutInflater)
@@ -61,7 +64,7 @@ class AttendanceActivity : AppCompatActivity() {
         }
 
         val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
-        registerReceiver(receiver, filter)
+        registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED)
     }
 
     private fun loadCourseData(courseId: String) {
@@ -98,8 +101,13 @@ class AttendanceActivity : AppCompatActivity() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
                 val results = FloatArray(1)
+                binding.textView4.text=location.latitude.toString()
+                binding.textView5.text=location.longitude.toString()
+
                 Location.distanceBetween(location.latitude, location.longitude, course.latitude, course.longitude, results)
                 isLocationOk = results[0] <= course.radius
+                binding.textView6.text=results[0].toString()
+
                 checkAllConditions()
             }
         }
@@ -107,8 +115,10 @@ class AttendanceActivity : AppCompatActivity() {
 
     private fun startBluetoothScan() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-             // Request permissions in a real app
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.BLUETOOTH_SCAN), 200)
+            return
         }
+
         bluetoothAdapter?.startDiscovery()
     }
 
@@ -140,7 +150,10 @@ class AttendanceActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(receiver)
-        bluetoothAdapter?.cancelDiscovery()
+        try {
+            unregisterReceiver(receiver)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
