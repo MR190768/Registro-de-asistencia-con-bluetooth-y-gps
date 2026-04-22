@@ -71,7 +71,6 @@ class CreateCourseActivity : AppCompatActivity() {
         }
         val enableBtLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                // Bluetooth was enabled
             }
         }
         if (bluetoothAdapter?.isEnabled == false) {
