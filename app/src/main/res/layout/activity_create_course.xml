@@ -12,44 +12,44 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Create New Course"
+            android:layout_marginBottom="16dp"
+            android:text="Crear una nueva clase"
             android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/etCourseName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Course Name"/>
+            android:hint="Nombre de la clase" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Location"
             android:layout_marginTop="16dp"
-            android:textStyle="bold"/>
+            android:text="Ubicacion"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/etLatitude"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Latitude"
+            android:hint="Latitud"
             android:inputType="numberDecimal|numberSigned" />
 
         <EditText
             android:id="@+id/etLongitude"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Longitude"
-            android:inputType="numberDecimal|numberSigned"/>
+            android:hint="Longitud"
+            android:inputType="numberDecimal|numberSigned" />
 
         <EditText
             android:id="@+id/etRadius"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Radius (meters)"
-            android:inputType="numberDecimal"/>
+            android:hint="Radio en metros (min 5 mts)"
+            android:inputType="numberDecimal" />
 
         <Button
             android:id="@+id/btnGetlocation"
@@ -60,29 +60,29 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Time Range"
             android:layout_marginTop="16dp"
-            android:textStyle="bold"/>
+            android:text="Rango de tiempo"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnStartTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select Start Time"/>
+            android:text="Elegir comienzo" />
 
         <Button
             android:id="@+id/btnEndTime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select End Time"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            android:text="Elegir final" />
 
         <Button
             android:id="@+id/btnSaveCourse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Save Course"
-            android:layout_marginTop="24dp"/>
+            android:layout_marginTop="24dp"
+            android:text="Guardar clase" />
 
     </LinearLayout>
 </ScrollView>

@@ -9,17 +9,17 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Register"
+        android:layout_marginBottom="24dp"
+        android:text="Registro"
         android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="24dp"/>
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/etName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Full Name"
-        android:inputType="textPersonName"/>
+        android:hint="Nombre completo"
+        android:inputType="textPersonName" />
 
     <EditText
         android:id="@+id/etEmail"
@@ -33,9 +33,9 @@
         android:id="@+id/etPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp"
+        android:hint="Contraseña"
+        android:inputType="textPassword" />
 
     <RadioGroup
         android:id="@+id/rgRole"
@@ -43,26 +43,28 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="16dp">
+
         <RadioButton
             android:id="@+id/rbTeacher"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Teacher"/>
+            android:text="Profesor" />
+
         <RadioButton
             android:id="@+id/rbStudent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Student"
-            android:checked="true"/>
+            android:checked="true"
+            android:text="Estudiante" />
     </RadioGroup>
 
     <Button
         android:id="@+id/btnRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Register"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp"
+        android:text="Registrarse" />
 
 </LinearLayout>

@@ -181,9 +181,9 @@ class AttendanceActivity : AppCompatActivity() {
 
     private fun checkAllConditions() {
         var status = ""
-        if (!isTimeOk) status += "Fuera de horario.\n"
-        if (!isLocationOk) status += "Fuera del radio permitido.\n"
-        if (!isBluetoothOk) status += "Señal del profesor no detectada.\n"
+        if (!isTimeOk) status += "Fuera de horario...\n"
+        if (!isLocationOk) status += "Fuera del radio permitido...\n"
+        if (!isBluetoothOk) status += "Señal del profesor no detectada...\n"
 
         if (isTimeOk && isLocationOk && isBluetoothOk) {
             binding.tvStatus.text = "¡Condiciones cumplidas!"

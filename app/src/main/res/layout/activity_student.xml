@@ -9,19 +9,19 @@
         android:id="@+id/tvStudentTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="My Enrolled Courses"
+        android:text="Mis clases inscritas"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btnLogoutStudent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Logout"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:text="Cerrar sesion"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/llEnroll"
@@ -36,14 +36,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Course Code"
-            android:inputType="number"/>
+            android:hint="codigo de la clase"
+            android:inputType="number" />
 
         <Button
             android:id="@+id/btnEnroll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enroll"/>
+            android:text="Inscribirse" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
