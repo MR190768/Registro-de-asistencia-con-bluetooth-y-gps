@@ -30,8 +30,9 @@ class CreateCourseActivity : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private var bluetoothaddress=""
-
+    private var bluetoothaddress = ""
+    private var editingCourseId: String? = null
+    private var currentCourse: Course? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,18 +40,24 @@ class CreateCourseActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        
+        // Verificar si estamos editando
+        editingCourseId = intent.getStringExtra("COURSE_ID")
+        if (editingCourseId != null) {
+            setupEditMode()
+        }
 
         binding.btnStartTime.setOnClickListener {
             showTimePicker { cal ->
                 startTime = cal
-                binding.btnStartTime.text = "Start: ${cal.get(Calendar.HOUR_OF_DAY)}:${cal.get(Calendar.MINUTE)}"
+                binding.btnStartTime.text = "Inicio: ${cal.get(Calendar.HOUR_OF_DAY)}:${String.format("%02d", cal.get(Calendar.MINUTE))}"
             }
         }
 
         binding.btnEndTime.setOnClickListener {
             showTimePicker { cal ->
                 endTime = cal
-                binding.btnEndTime.text = "End: ${cal.get(Calendar.HOUR_OF_DAY)}:${cal.get(Calendar.MINUTE)}"
+                binding.btnEndTime.text = "Fin: ${cal.get(Calendar.HOUR_OF_DAY)}:${String.format("%02d", cal.get(Calendar.MINUTE))}"
             }
         }
 
@@ -62,23 +69,42 @@ class CreateCourseActivity : AppCompatActivity() {
             getLocation()
         }
 
+        setupBluetooth()
+    }
+
+    private fun setupEditMode() {
+        binding.btnSaveCourse.text = "Actualizar Curso"
+        database.child(editingCourseId!!).get().addOnSuccessListener { snapshot ->
+            currentCourse = snapshot.getValue(Course::class.java)
+            currentCourse?.let {
+                binding.etCourseName.setText(it.name)
+                binding.etLatitude.setText(it.latitude.toString())
+                binding.etLongitude.setText(it.longitude.toString())
+                binding.etRadius.setText(it.radius.toString())
+                
+                startTime.timeInMillis = it.startTime
+                endTime.timeInMillis = it.endTime
+                
+                binding.btnStartTime.text = "Inicio: ${startTime.get(Calendar.HOUR_OF_DAY)}:${String.format("%02d", startTime.get(Calendar.MINUTE))}"
+                binding.btnEndTime.text = "Fin: ${endTime.get(Calendar.HOUR_OF_DAY)}:${String.format("%02d", endTime.get(Calendar.MINUTE))}"
+            }
+        }
+    }
+
+    private fun setupBluetooth() {
         val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
         val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.getAdapter()
 
-        if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_CONNECT), 1)
-            return
-        }
-        val enableBtLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-            }
-        }
-        if (bluetoothAdapter?.isEnabled == false) {
+        if (bluetoothAdapter?.isEnabled==false){
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            enableBtLauncher.launch(enableBtIntent)
+            startActivityForResult(enableBtIntent, 1)
         }
-        bluetoothaddress=bluetoothAdapter?.name.toString()
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.BLUETOOTH_CONNECT), 1)
+        }
+
+        bluetoothaddress = bluetoothAdapter?.name ?: bluetoothAdapter?.address ?: "Sin Bluetooth"
     }
 
     private fun showTimePicker(onTimeSelected: (Calendar) -> Unit) {
@@ -96,13 +122,32 @@ class CreateCourseActivity : AppCompatActivity() {
         val lat = binding.etLatitude.text.toString().toDoubleOrNull() ?: 0.0
         val lon = binding.etLongitude.text.toString().toDoubleOrNull() ?: 0.0
         val radius = binding.etRadius.text.toString().toFloatOrNull() ?: 0f
+
+
+        if(lat == 0.0 || lon == 0.0 || name.isEmpty() || radius == 0f){
+            Toast.makeText(this, "Por favor llene todos los campos", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if(bluetoothaddress=="Sin Bluetooth"){
+            Toast.makeText(this, "Por favor habilite Bluetooth", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if(radius !in 1.0..15.0){
+            Toast.makeText(this, "El radio debe estar entre 1 y 15", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+
         val teacherId = auth.currentUser?.uid ?: ""
-        val courseId = database.push().key ?: ""
-        val code = (100000..999999).random().toString()
+        
+        val id = editingCourseId ?: database.push().key ?: ""
+        val code = currentCourse?.code ?: (100000..999999).random().toString()
 
         if (name.isNotEmpty()) {
             val course = Course(
-                id = courseId,
+                id = id,
                 name = name,
                 teacherId = teacherId,
                 code = code,
@@ -114,9 +159,10 @@ class CreateCourseActivity : AppCompatActivity() {
                 bluetoothAddress = bluetoothaddress
             )
 
-            database.child(courseId).setValue(course).addOnCompleteListener {
+            database.child(id).setValue(course).addOnCompleteListener {
                 if (it.isSuccessful) {
-                    Toast.makeText(this, "Course Created! Code: $code", Toast.LENGTH_LONG).show()
+                    val msg = if (editingCourseId != null) "Curso Actualizado" else "Curso Creado! Código: $code"
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
                     finish()
                 }
             }
@@ -131,11 +177,9 @@ class CreateCourseActivity : AppCompatActivity() {
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
-                val results = FloatArray(1)
                 binding.etLatitude.setText(location.latitude.toString())
                 binding.etLongitude.setText(location.longitude.toString())
             }
         }
     }
-
 }

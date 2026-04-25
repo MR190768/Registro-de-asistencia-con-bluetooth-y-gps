@@ -48,7 +48,7 @@
             android:id="@+id/etRadius"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Radio en metros (min 5 mts)"
+            android:hint="Radio en metros (max 15 mts)"
             android:inputType="numberDecimal" />
 
         <Button

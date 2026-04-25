@@ -37,7 +37,7 @@ class LoginActivity : AppCompatActivity() {
                         }
                     }
             } else {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Por favor llene todos los campos", Toast.LENGTH_SHORT).show()
             }
         }
 

@@ -36,17 +36,17 @@ class RegisterActivity : AppCompatActivity() {
                             val user = User(uid, name, email, role)
                             database.child(uid).setValue(user).addOnCompleteListener {
                                 if (it.isSuccessful) {
-                                    Toast.makeText(this, "User Registered", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this, "Usuario registrado", Toast.LENGTH_SHORT).show()
                                     startActivity(Intent(this, LoginActivity::class.java))
                                     finish()
                                 }
                             }
                         } else {
-                            Toast.makeText(this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Registro fallo: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                         }
                     }
             } else {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Por favor llena todos los campos", Toast.LENGTH_SHORT).show()
             }
         }
     }

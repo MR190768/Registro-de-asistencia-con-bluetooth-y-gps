@@ -1,6 +1,5 @@
 package com.example.registroasistencia
 
-import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -28,8 +27,10 @@ class TeacherActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         adapter = CourseAdapter(courses) { course ->
-            // Teacher clicks on course: Option to activate Bluetooth for attendance
-            activateBluetooth()
+            val intent = Intent(this, AttendanceReportActivity::class.java)
+            intent.putExtra("COURSE_ID", course.id)
+            intent.putExtra("COURSE_NAME", course.name)
+            startActivity(intent)
         }
 
         binding.rvCoursesTeacher.layoutManager = LinearLayoutManager(this)
@@ -61,27 +62,8 @@ class TeacherActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@TeacherActivity, "Error loading courses", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@TeacherActivity, "Error al cargar las clases", Toast.LENGTH_SHORT).show()
             }
         })
-    }
-
-    private fun activateBluetooth() {
-        val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-        if (bluetoothAdapter == null) {
-            Toast.makeText(this, "Bluetooth not supported", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        if (!bluetoothAdapter.isEnabled) {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivity(enableBtIntent)
-        } else {
-            val discoverableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
-                putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
-            }
-            startActivity(discoverableIntent)
-            Toast.makeText(this, "Bluetooth discoverable for 5 minutes", Toast.LENGTH_SHORT).show()
-        }
     }
 }

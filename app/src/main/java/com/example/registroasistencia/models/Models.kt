@@ -22,6 +22,7 @@ data class Course(
 
 data class Attendance(
     val studentId: String = "",
+    val studentName: String = "",
     val courseId: String = "",
     val timestamp: Long = 0
 )

@@ -22,11 +22,14 @@ import androidx.lifecycle.lifecycleScope
 import com.example.registroasistencia.databinding.ActivityAttendanceBinding
 import com.example.registroasistencia.models.Attendance
 import com.example.registroasistencia.models.Course
+import com.example.registroasistencia.models.User
 import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AttendanceActivity : AppCompatActivity() {
 
@@ -63,7 +66,6 @@ class AttendanceActivity : AppCompatActivity() {
                         intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     }
                     device?.let {
-                        // Verificamos por nombre o dirección (depende de qué guardes en 'bluetoothaddress')
                         if (it.name == bluetoothaddress || it.address == bluetoothaddress) {
                             isBluetoothOk = true
                             checkAllConditions()
@@ -71,7 +73,6 @@ class AttendanceActivity : AppCompatActivity() {
                     }
                 }
                 BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
-                    // Si no se ha encontrado y seguimos en la actividad, reiniciamos el escaneo
                     if (!isBluetoothOk) startBluetoothScan()
                 }
             }
@@ -107,7 +108,7 @@ class AttendanceActivity : AppCompatActivity() {
                         checkAllConditions()
                     }
                 }
-                delay(1000) // Verifica cada segundo
+                delay(1000)
             }
         }
     }
@@ -120,8 +121,32 @@ class AttendanceActivity : AppCompatActivity() {
                     binding.tvAttendanceCourseName.text = it.name
                     bluetoothaddress = it.bluetoothAddress
                     startRealTimeChecks()
+                    calculateStudentAttendancePercentage(it.id)
                 }
             }
+    }
+
+    private fun calculateStudentAttendancePercentage(courseId: String) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val attendanceRef = FirebaseDatabase.getInstance().getReference("attendance").child(courseId)
+        
+        attendanceRef.get().addOnSuccessListener { snapshot ->
+            var totalDays = snapshot.childrenCount.toDouble()
+            var attendedDays = 0
+            
+            for (daySnapshot in snapshot.children) {
+                if (daySnapshot.hasChild(uid)) {
+                    attendedDays++
+                }
+            }
+            
+            if (totalDays > 0) {
+                val percentage = (attendedDays / totalDays) * 100
+                binding.textView6.text = "Tu asistencia: ${String.format("%.1f", percentage)}%"
+            } else {
+                binding.textView6.text = "Asistencia: 0%"
+            }
+        }
     }
 
     private fun startRealTimeChecks() {
@@ -136,9 +161,9 @@ class AttendanceActivity : AppCompatActivity() {
             return
         }
 
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000)
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
             .setWaitForAccurateLocation(false)
-            .setMinUpdateIntervalMillis(2000)
+            .setMinUpdateIntervalMillis(10000)
             .build()
 
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
@@ -147,13 +172,8 @@ class AttendanceActivity : AppCompatActivity() {
     private fun updateLocationStatus(location: Location) {
         course?.let {
             val results = FloatArray(1)
-            binding.textView4.text = "Lat: ${location.latitude}"
-            binding.textView5.text = "Lon: ${location.longitude}"
-
             Location.distanceBetween(location.latitude, location.longitude, it.latitude, it.longitude, results)
             isLocationOk = results[0] <= it.radius
-            binding.textView6.text = "Distancia: ${results[0].toInt()}m (Máx: ${it.radius}m)"
-
             checkAllConditions()
         }
     }
@@ -198,12 +218,27 @@ class AttendanceActivity : AppCompatActivity() {
 
     private fun markAsPresent() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-        val attendance = Attendance(uid, course?.id ?: "", System.currentTimeMillis())
-        FirebaseDatabase.getInstance().getReference("attendance")
-            .child(course?.id ?: "").child(uid).setValue(attendance)
-            .addOnSuccessListener {
-                Toast.makeText(this, "¡Asistencia registrada!", Toast.LENGTH_SHORT).show()
-                finish()
+        val courseId = course?.id ?: ""
+        val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        
+        // Obtenemos el nombre del estudiante antes de guardar
+        FirebaseDatabase.getInstance().getReference("users").child(uid).get()
+            .addOnSuccessListener { userSnapshot ->
+                val user = userSnapshot.getValue(User::class.java)
+                val studentName = user?.name ?: "Estudiante"
+                
+                val attendance = Attendance(uid, studentName, courseId, System.currentTimeMillis())
+                
+                FirebaseDatabase.getInstance().getReference("attendance")
+                    .child(courseId)
+                    .child(date)
+                    .child(uid)
+                    .setValue(attendance)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "¡Asistencia registrada!", Toast.LENGTH_SHORT).show()
+                        calculateStudentAttendancePercentage(courseId)
+                        finish()
+                    }
             }
     }
 

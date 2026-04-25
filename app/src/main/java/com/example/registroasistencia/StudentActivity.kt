@@ -56,13 +56,13 @@ class StudentActivity : AppCompatActivity() {
                         val uid = auth.currentUser?.uid ?: ""
                         dbEnrollments.child(uid).child(course.id).setValue(true).addOnCompleteListener {
                             if (it.isSuccessful) {
-                                Toast.makeText(this@StudentActivity, "Enrolled in ${course.name}", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@StudentActivity, "Se ha inscrito a ${course.name} exitosamente", Toast.LENGTH_SHORT).show()
                                 binding.etEnrollCode.text.clear()
                             }
                         }
                     }
                 } else {
-                    Toast.makeText(this@StudentActivity, "Invalid Code", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@StudentActivity, "Codigo invalido", Toast.LENGTH_SHORT).show()
                 }
             }
             override fun onCancelled(error: DatabaseError) {}
